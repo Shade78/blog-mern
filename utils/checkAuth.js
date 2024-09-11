@@ -3,7 +3,7 @@
 import jwt from "jsonwebtoken";
 
 export default (req, res, next) => {
-  const token = (req.headers.authorization || "").replace(/Bearer\s?/, "");
+  const token = (req.headers.authorization || "").replace(/Bearer\s?/, ""); // достаем токен из запроса и убираем лишнее
 
   if (token) {
     try {

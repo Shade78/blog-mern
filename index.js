@@ -1,11 +1,16 @@
 import express from "express";
 import mongoose from "mongoose";
 
-import { registerValidation } from "./validations/auth.js";
+import {
+  registerValidation,
+  loginValidation,
+  postCreateValidation,
+} from "./validation.js";
 
 import checkAuth from "./utils/checkAuth.js";
 
 import * as UserController from "./controllers/UserController.js";
+import * as PostController from "./controllers/PostController.js";
 
 mongoose
   .connect(
@@ -26,9 +31,15 @@ app.get("/", (req, res) => {
   res.send("main page is ok");
 });
 
-app.post("/auth/login", UserController.login);
+app.post("/auth/login", loginValidation, UserController.login);
 app.post("/auth/register", registerValidation, UserController.register);
 app.get("/auth/me", checkAuth, UserController.getMe);
+
+app.get("/posts", PostController.getAll);
+// app.get('/posts/:id', PostController.getOne)
+app.post("/posts", checkAuth, postCreateValidation, PostController.create); // сначала проверяем есть ли права у пользователя, потом валидируем пост
+// app.delete('/posts', PostController.remove)
+// app.patch('/posts', PostController.update)
 
 app.listen(4444, (err) => {
   if (err) {
