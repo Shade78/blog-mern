@@ -35,3 +35,84 @@ export const getAll = async (req, res) => {
     });
   }
 };
+
+export const getOne = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    PostModel.findOneAndUpdate(
+      {
+        _id: postId, // находим пост по id
+      },
+      {
+        $inc: { viewsCount: 1 }, // что хотим обновить
+      },
+      {
+        returnDocument: "after", // возвращаем актуальный документ
+      }
+    )
+      .then((doc) => res.json(doc))
+      .catch((err) => {
+        console.log(err);
+        return res.status(404).json({
+          message: "Статья не найдена",
+        });
+      });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось получить статьи",
+    });
+  }
+};
+
+export const remove = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    const doc = await PostModel.findOneAndDelete({ _id: postId });
+
+    if (!doc) {
+      return res.status(404).json({
+        message: "Статья не найдена",
+      });
+    }
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось удалить статью",
+    });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    await PostModel.updateOne(
+      {
+        _id: postId,
+      },
+      {
+        title: req.body.title,
+        text: req.body.text,
+        tags: req.body.tags,
+        ImageUrl: req.body.ImageUrl,
+        user: req.userId,
+      }
+    );
+
+    res.json({
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Не удалось обновить статью",
+    });
+  }
+};
