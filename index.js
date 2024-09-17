@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
+import cors from "cors";
 
 import {
   registerValidation,
@@ -24,6 +25,8 @@ mongoose
   });
 
 const app = express();
+app.use(express.json()); // позволяет читать json из запросов
+app.use(cors());
 app.use("/uploads", express.static("uploads")); // по сути get запрос на получение статичного файла
 
 const storage = multer.diskStorage({
@@ -36,8 +39,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-app.use(express.json()); // позволяет читать json из запросов
 
 app.get("/", (req, res) => {
   res.send("main page is ok");
@@ -64,8 +65,11 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
   });
 });
 
+// app.get("/tags", PostController.getLastTags);
+
 // для всех
 app.get("/posts", PostController.getAll);
+app.get("/tags", PostController.getLastTags);
 app.get("/posts/:id", PostController.getOne);
 
 // только для авторизованных
